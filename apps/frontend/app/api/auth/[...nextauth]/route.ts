@@ -1,16 +1,10 @@
-import NextAuth, {
-  Account,
-  NextAuthOptions,
-  Profile,
-  Session,
-  User,
-} from "next-auth";
+import NextAuth, { Account, Profile, Session, User } from "next-auth";
 import { AdapterUser } from "next-auth/adapters";
 import { JWT } from "next-auth/jwt";
 import TwitterProvider from "next-auth/providers/twitter";
 import { prismaClient } from "@repo/db/client";
 
-export const authOptions: NextAuthOptions = {
+const handler = NextAuth({
   providers: [
     TwitterProvider({
       clientId: process.env.API_KEY || "",
@@ -95,8 +89,6 @@ export const authOptions: NextAuthOptions = {
       };
     },
   },
-};
-
-const handler = NextAuth(authOptions);
+});
 
 export { handler as GET, handler as POST };

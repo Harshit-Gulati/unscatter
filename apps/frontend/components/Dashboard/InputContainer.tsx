@@ -30,6 +30,7 @@ export default function ({
         {
           topic,
           isDevMode,
+          //@ts-ignore
           id: session?.user?.id,
         }
       );
@@ -38,7 +39,7 @@ export default function ({
       setError(STATIC_STRINGS.ERROR);
       console.error("Error fetching tweets", error);
     } finally {
-      inputRef.current.value = "";
+      if (inputRef.current) inputRef.current.value = "";
     }
   };
 
