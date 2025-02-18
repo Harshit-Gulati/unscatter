@@ -1,6 +1,6 @@
 import express, { Request, Response, Router } from "express";
-import { fetchAndLikeTweets } from "./services/services";
-import { apiData } from "./services/exampleData";
+import { fetchAndLikeTweets } from "../services/services";
+import { apiData } from "../services/exampleData";
 
 const twitterRouter: Router = express.Router();
 
@@ -42,6 +42,7 @@ twitterRouter.post("/tweets", async (req: Request, res: Response) => {
     return;
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch & like tweets" });
+    return;
   }
 });
 

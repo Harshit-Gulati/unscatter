@@ -8,7 +8,6 @@
     "start": "next start"
   },
   "dependencies": {
-    "@repo/db": "workspace:*",
     "axios": "^1.7.9",
     "lucide-react": "^0.475.0",
     "next": "15.1.7",

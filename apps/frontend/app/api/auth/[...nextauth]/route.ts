@@ -2,7 +2,7 @@ import NextAuth, { Account, Profile, Session, User } from "next-auth";
 import { AdapterUser } from "next-auth/adapters";
 import { JWT } from "next-auth/jwt";
 import TwitterProvider from "next-auth/providers/twitter";
-import { prismaClient } from "@repo/db/client";
+import axios from "axios";
 
 const handler = NextAuth({
   providers: [
@@ -42,34 +42,18 @@ const handler = NextAuth({
       return token;
     },
     async signIn({ user, account }) {
-      if (user && account) {
-        try {
-          const existingUser = await prismaClient.user.findUnique({
-            where: { id: user.id },
+      try {
+        if (user && account) {
+          await axios.post(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/auth`, {
+            user,
+            account,
           });
-
-          if (existingUser) {
-            await prismaClient.user.update({
-              where: { id: user.id },
-              data: {
-                refreshToken: account.oauth_token as string,
-                accessToken: account.oauth_token_secret as string,
-              },
-            });
-          } else {
-            await prismaClient.user.create({
-              data: {
-                id: user.id,
-                refreshToken: account.oauth_token as string,
-                accessToken: account.oauth_token_secret as string,
-              },
-            });
-          }
-        } catch (error) {
-          console.error("Error in signIn callback:", error);
         }
+        return true;
+      } catch (error) {
+        console.error("Sign-in callback error:", error);
+        return false;
       }
-      return true;
     },
     async session({
       session,
