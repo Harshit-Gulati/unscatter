@@ -22,9 +22,7 @@ export const fetchAndLikeTweets = async (topic: string, id: string) => {
     const twitterClient = client.readWrite;
     const twitterBearer = bearer.readOnly;
 
-    const response = await twitterBearer.v2.search(
-      `${topic} -is:retweet min_faves:5 lang:en`
-    );
+    const response = await twitterBearer.v2.search(topic);
 
     const tweets = response._realData.data || [];
     if (tweets.length === 0) {
