@@ -29,8 +29,10 @@ export const fetchAndLikeTweets = async (topic: string, id: string) => {
       return { success: true, message: "No tweets found", tweets: [] };
     }
 
+    const threeTweets = tweets.slice(0, 3);
+
     const likedTweets = [];
-    for (const tweet of tweets) {
+    for (const tweet of threeTweets) {
       try {
         await twitterClient.v2.like(process.env.APP_ID, tweet.id);
         likedTweets.push({ success: true, tweetId: tweet.id });
