@@ -14,4 +14,6 @@ export const STATIC_STRINGS = {
   NOTE: "Note : Turn on Developer Mode to get mock data incase X API Limit gets exhausted!",
   ERROR:
     "Error fetching & liking all 3 tweets! Probable Reason : X API limit exhausted. Try after 15 minutes.",
+  FETCHING_TWEETS: "Fetching Tweets",
+  LIKING_TWEETS: "Liking Tweets",
 };

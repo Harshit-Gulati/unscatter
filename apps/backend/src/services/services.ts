@@ -3,7 +3,28 @@ import dotenv from "dotenv";
 const { TwitterApi } = require("twitter-api-v2");
 dotenv.config();
 
-export const fetchAndLikeTweets = async (topic: string, id: string) => {
+export const fetchTweets = async (topic: string) => {
+  try {
+    const bearer = new TwitterApi(process.env.BEARER_TOKEN);
+    const twitterBearer = bearer.readOnly;
+
+    const response = await twitterBearer.v2.search(topic);
+
+    const tweets = response._realData.data || [];
+    if (tweets.length === 0) {
+      return { success: true, message: "No tweets found", tweets: [] };
+    }
+
+    const threeTweets = tweets.slice(0, 3);
+
+    return { success: true, tweets: threeTweets };
+  } catch (err) {
+    console.error("Error fetching tweets:", err);
+    return { success: false, tweets: [] };
+  }
+};
+
+export const likeTweets = async (id: string, tweets: any[]) => {
   try {
     const user = await prismaClient.user.findUnique({
       where: { id },
@@ -18,21 +39,10 @@ export const fetchAndLikeTweets = async (topic: string, id: string) => {
       accessToken: user.accessToken,
       accessSecret: user.refreshToken,
     });
-    const bearer = new TwitterApi(process.env.BEARER_TOKEN);
     const twitterClient = client.readWrite;
-    const twitterBearer = bearer.readOnly;
-
-    const response = await twitterBearer.v2.search(topic);
-
-    const tweets = response._realData.data || [];
-    if (tweets.length === 0) {
-      return { success: true, message: "No tweets found", tweets: [] };
-    }
-
-    const threeTweets = tweets.slice(0, 3);
 
     const likedTweets = [];
-    for (const tweet of threeTweets) {
+    for (const tweet of tweets) {
       try {
         await twitterClient.v2.like(process.env.APP_ID, tweet.id);
         likedTweets.push({ success: true, tweetId: tweet.id });
@@ -42,9 +52,9 @@ export const fetchAndLikeTweets = async (topic: string, id: string) => {
       }
     }
 
-    return { success: true, tweets: likedTweets };
+    return { success: true, likedTweets: likedTweets };
   } catch (err) {
-    console.error("Error fetching and liking tweets:", err);
-    return { success: false, tweets: [] };
+    console.error("Error liking tweets:", err);
+    return { success: false, likedTweets: [] };
   }
 };

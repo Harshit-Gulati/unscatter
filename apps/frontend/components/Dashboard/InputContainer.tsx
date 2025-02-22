@@ -5,13 +5,16 @@ import axios from "axios";
 import { STATIC_STRINGS } from "@/utils/Constants";
 import { TweetType } from "@/utils/types";
 import { useSession } from "next-auth/react";
+import { LOADING } from "@/utils/enums";
 
 export default function ({
   setTweets,
   isDevMode,
+  setLoading,
 }: {
   setTweets: Dispatch<SetStateAction<TweetType[]>>;
   isDevMode: boolean;
+  setLoading: Dispatch<SetStateAction<LOADING>>;
 }) {
   const { data: session } = useSession();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -25,19 +28,35 @@ export default function ({
     }
 
     try {
+      setLoading(LOADING.FETCH);
+
       const res = await axios.post(
-        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/twitter/tweets`,
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/twitter/fetch-tweets`,
         {
           topic,
+          isDevMode,
+        }
+      );
+
+      const fetchedTweets = res.data.tweets;
+
+      setLoading(LOADING.LIKE);
+
+      const likeRes = await axios.post(
+        `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/twitter/like-tweets`,
+        {
+          tweets: fetchedTweets,
           isDevMode,
           //@ts-ignore
           id: session?.user?.id,
         }
       );
-      setTweets(res.data.likedTweets);
+
+      setLoading(LOADING.NOT_LOADING);
+      setTweets(likeRes.data.likedTweets);
     } catch (error) {
       setError(STATIC_STRINGS.ERROR);
-      console.error("Error fetching tweets", error);
+      console.error("Error fetching and liking tweets", error);
     } finally {
       if (inputRef.current) inputRef.current.value = "";
     }

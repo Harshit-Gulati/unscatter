@@ -8,9 +8,9 @@ export default function RenderTweets({ tweets }: { tweets: TweetType[] }) {
       <div className="font-semibold text-xl">
         {STATIC_STRINGS.FETCHED_TWEETS}
       </div>
-      <div className="flex flex-col md:flex-row max-h-fit">
+      <div className="flex gap-1 flex-col md:flex-row max-h-fit">
         {tweets.map((tweet, index) => (
-          <div key={index} className="m-2">
+          <div key={index}>
             <Tweet id={tweet.tweetId} />
           </div>
         ))}
